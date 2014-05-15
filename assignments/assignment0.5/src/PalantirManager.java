@@ -17,6 +17,7 @@ public class PalantirManager {
      * Simple implementation of a Semaphore that can be configured
      * to use the "fair" policy.
      */
+//    private Semaphore mAvailable = null;
     private SimpleSemaphore mAvailable = null;
 
     /**
@@ -42,6 +43,7 @@ public class PalantirManager {
         /**
          * Use the "fair" policy.
          */
+//        mAvailable = new Semaphore(mMaxPalantiri, true);
         mAvailable = new SimpleSemaphore(mMaxPalantiri, true);
     }
 
