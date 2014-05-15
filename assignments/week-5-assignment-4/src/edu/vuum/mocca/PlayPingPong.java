@@ -1,9 +1,9 @@
 package edu.vuum.mocca;
 
-import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Semaphore;
 
 /**
  * @class PlayPingPong
@@ -22,7 +22,7 @@ public class PlayPingPong implements Runnable
     private static volatile int mMaxIterations;
 
     /** Maximum number of iterations per "turn" (defaults to 1). */
-    private static volatile int mMaxTurns = 1;
+    private static int mMaxTurns = 1;
 
     /**
      * Keeps track of the platform that we're running on, e.g.,
@@ -166,7 +166,7 @@ public class PlayPingPong implements Runnable
     static class PingPongThreadCond extends PingPongThread 
     {
         /**
-         * Semaphores that schedule the ping/pong algorithm.
+         * Conditions that schedule the ping/pong algorithm.
          */
         private Condition mConds[] = new Condition[2];
 
@@ -178,7 +178,7 @@ public class PlayPingPong implements Runnable
         /**
          * Number of times we've iterated thus far in our "turn".
          */
-        private int mTurnCountDown = 0;
+        private int mIterationCount = 0;
         
         /**
          * Id for the other thread.
@@ -188,7 +188,7 @@ public class PlayPingPong implements Runnable
         /**
          * Thread whose turn it currently is.
          */
-        private static long mTurnOwner;
+        private static long mThreadOwner;
         
         public void setOtherThreadId(long otherThreadId) 
         {
@@ -208,12 +208,12 @@ public class PlayPingPong implements Runnable
                            boolean isOwner) 
         {
             super(stringToPrint);
-            mTurnCountDown = mMaxTurns;
+            mIterationCount = mMaxTurns;
             mLock = lock;
             mConds[FIRST_COND] = firstCond;
             mConds[SECOND_COND] = secondCond;
             if (isOwner) 
-                mTurnOwner = this.getId();
+                mThreadOwner = this.getId();
         }
 
         /**
@@ -222,7 +222,7 @@ public class PlayPingPong implements Runnable
         void acquire() {
             mLock.lock();
 
-            while (mTurnOwner != this.getId()) {
+            while (mThreadOwner != this.getId()) {
                 mConds[FIRST_COND].awaitUninterruptibly();
             }
 
@@ -235,11 +235,11 @@ public class PlayPingPong implements Runnable
         void release() {
             mLock.lock();
 
-            --mTurnCountDown;
+            --mIterationCount;
 
-            if (mTurnCountDown == 0) {
-                mTurnOwner = mOtherThreadId;
-                mTurnCountDown = mMaxTurns;
+            if (mIterationCount == 0) {
+                mThreadOwner = mOtherThreadId;
+                mIterationCount = mMaxTurns;
                 mConds[SECOND_COND].signal();
             }
             mLock.unlock();
