@@ -79,7 +79,7 @@ proguard/
 
 # Temp files for KDE and other Editor's 
 *~
-.ipr
-.iws
-.iml
+*.ipr
+*.iws
+*.iml
 idea/
