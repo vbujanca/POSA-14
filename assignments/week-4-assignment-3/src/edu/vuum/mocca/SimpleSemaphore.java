@@ -1,6 +1,4 @@
-package edu.vuum.mooca;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.ReentrantLock;
+package edu.vuum.mocca;
 
 /**
  * @class SimpleSemaphore

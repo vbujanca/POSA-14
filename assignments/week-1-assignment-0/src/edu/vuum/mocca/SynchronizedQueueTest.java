@@ -1,4 +1,4 @@
-package edu.vuum.mooca;
+package edu.vuum.mocca;
 import static org.junit.Assert.*;
 
 import java.util.concurrent.ArrayBlockingQueue;
@@ -6,7 +6,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import org.junit.Before;
 import org.junit.Test;
 
-import edu.vuum.mooca.SynchronizedQueue.*;
+import edu.vuum.mocca.SynchronizedQueue.*;
 
 /**
  * @class SynchronizedQueueTest
