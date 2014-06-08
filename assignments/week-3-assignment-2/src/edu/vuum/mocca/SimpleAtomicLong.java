@@ -42,11 +42,11 @@ class SimpleAtomicLong
     {
         long value;
         // TODO - you fill in here, using a readLock()
-        this.mRWLock.writeLock().lock();
+        this.mRWLock.readLock().lock();
         try{
             value = this.mValue;
         }finally {
-            this.mRWLock.writeLock().unlock();
+            this.mRWLock.readLock().unlock();
         }
         return value;
     }

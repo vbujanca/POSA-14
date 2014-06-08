@@ -51,7 +51,7 @@ public class SimpleSemaphore {
         try{
             while(this.permits == 0) this.outOfPermits.await();
             this.permits --;
-            outOfPermits.signalAll();
+            outOfPermits.signal();
         }finally {
             this.lock.unlock();
         }
