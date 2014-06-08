@@ -1,5 +1,8 @@
 package edu.vuum.mocca;
 
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
+
 /**
  * @class SimpleSemaphore
  * 
@@ -13,22 +16,28 @@ public class SimpleSemaphore {
      * Define a ReentrantLock to protect the critical section.
      */
     // TODO - you fill in here
+    private ReentrantLock lock;
 
     /**
      * Define a Condition that waits while the number of permits is 0.
      */
     // TODO - you fill in here
+    Condition outOfPermits;
 
     /**
      * Define a count of the number of available permits.
      */
-    // TODO - you fill in here. Make sure that this data member will
+    // TODO - you fill in here.  Make sure that this data member will
     // ensure its values aren't cached by multiple Threads..
+    private int permits;
 
     public SimpleSemaphore(int permits, boolean fair) {
         // TODO - you fill in here to initialize the SimpleSemaphore,
         // making sure to allow both fair and non-fair Semaphore
         // semantics.
+        this.permits = permits;
+        this.lock = new ReentrantLock(fair);
+        this.outOfPermits = this.lock.newCondition();
     }
 
     /**
@@ -37,6 +46,14 @@ public class SimpleSemaphore {
      */
     public void acquire() throws InterruptedException {
         // TODO - you fill in here.
+        this.lock.lockInterruptibly();
+        try{
+            while(this.permits == 0) this.outOfPermits.await();
+            this.permits --;
+            outOfPermits.signal();
+        }finally {
+            this.lock.unlock();
+        }
     }
 
     /**
@@ -45,6 +62,14 @@ public class SimpleSemaphore {
      */
     public void acquireUninterruptibly() {
         // TODO - you fill in here.
+        this.lock.lock();
+        try{
+            while(this.permits == 0) this.outOfPermits.awaitUninterruptibly();
+           this.permits --;
+            outOfPermits.signal();
+        }  finally {
+            this.lock.unlock();
+        }
     }
 
     /**
@@ -52,6 +77,14 @@ public class SimpleSemaphore {
      */
     void release() {
         // TODO - you fill in here.
+        this.lock.lock();
+        try{
+            this.permits ++;
+            outOfPermits.signal();
+
+        }finally {
+            this.lock.unlock();
+        }
     }
 
     /**
@@ -59,6 +92,6 @@ public class SimpleSemaphore {
      */
     public int availablePermits() {
         // TODO - you fill in here to return the correct result
-    	return 0;
+        return this.permits;
     }
 }
