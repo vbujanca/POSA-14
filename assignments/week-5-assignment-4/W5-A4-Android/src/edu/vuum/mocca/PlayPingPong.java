@@ -1,5 +1,6 @@
 package edu.vuum.mocca;
 
+import java.util.Random;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
@@ -84,6 +85,11 @@ public class PlayPingPong implements Runnable {
                 acquire();
 
                 mPlatformStrategy.print(mStringToPrint + "(" + loopsDone + ")");
+                try {
+                    Thread.sleep(100 + new Random().nextInt(500));
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
 
                 release();
             }

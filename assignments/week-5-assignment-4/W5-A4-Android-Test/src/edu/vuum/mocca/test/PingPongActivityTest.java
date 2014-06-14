@@ -75,7 +75,7 @@ public class PingPongActivityTest
         // wait for the threads to execute
         Thread.sleep(TestOptions.ACCEPTABLE_RUNTIME_LENGTH);
 
-        assertTrue(outputTextView_.getText().toString()
-                   .equals(TestOptions.ANDROID_TEXTVIEW));
+//        assertTrue(outputTextView_.getText().toString().equals(TestOptions.ANDROID_TEXTVIEW));
+        assertEquals(outputTextView_.getText().toString(),TestOptions.ANDROID_TEXTVIEW);
     }
 }

@@ -30,12 +30,12 @@ import android.util.Log;
  *        is a type of URI) and a Messenger. It downloads the file at
  *        the URL, stores it on the file system, then returns the path
  *        name to the caller using the supplied Messenger.
- * 
+ *
  *        The DownloadService class implements the CommandProcessor
  *        pattern and The Messenger is used as part of the Active
  *        Object pattern.
  */
-public class DownloadService extends Service 
+public class DownloadService extends Service
 {
     /**
      * Looper associated with the HandlerThread.
@@ -57,7 +57,7 @@ public class DownloadService extends Service
         // Create the Intent that's associated to the DownloadService
         // class.
         Intent intent = new Intent(context,
-                                   DownloadService.class);
+                DownloadService.class);
 
         // Set the URI as data in the Intent.
         intent.setData(uri);
@@ -65,7 +65,7 @@ public class DownloadService extends Service
         // Create and pass a Messenger as an "extra" so the
         // DownloadService can send back the pathname.
         intent.putExtra("MESSENGER",
-                        new Messenger(downloadHandler));
+                new Messenger(downloadHandler));
         return intent;
     }
 
@@ -80,13 +80,13 @@ public class DownloadService extends Service
     private final class ServiceHandler extends Handler {
         /**
          * Class constructor initializes the Looper.
-         * 
+         *
          * @param Looper
          *            The Looper that we borrow from HandlerThread.
          */
-    	public ServiceHandler(Looper looper) {
+        public ServiceHandler(Looper looper) {
             super(looper);
-    	}
+        }
 
         /**
          * A factory method that creates a Message to return to the
@@ -96,15 +96,15 @@ public class DownloadService extends Service
             Message message = Message.obtain();
             // Return the result to indicate whether the download
             // succeeded or failed.
-            message.arg1 = pathname == null 
-                ? Activity.RESULT_CANCELED 
-                : Activity.RESULT_OK;
+            message.arg1 = pathname == null
+                    ? Activity.RESULT_CANCELED
+                    : Activity.RESULT_OK;
 
             Bundle bundle = new Bundle();
 
             // Pathname for the downloaded image.
-            bundle.putString("PATHNAME", 
-                             pathname);
+            bundle.putString("PATHNAME",
+                    pathname);
             message.setData(bundle);
             return message;
         }
@@ -132,7 +132,7 @@ public class DownloadService extends Service
         private void downloadImageAndReply(Intent intent) {
             // Download the requested image.
             String pathname = downloadImage(DownloadService.this,
-                                            intent.getData().toString());
+                    intent.getData().toString());
 
             // Extract the Messenger.
             Messenger messenger = (Messenger)
@@ -146,45 +146,45 @@ public class DownloadService extends Service
          * Send the pathname back to the DownloadActivity via the
          * messenger.
          */
-        private void sendPath(Messenger messenger, 
+        private void sendPath(Messenger messenger,
                               String pathname) {
             // Call factory method to create Message.
             Message message = makeReplyMessage(pathname);
-        
+
             try {
                 // Send pathname to back to the DownloadActivity.
                 messenger.send(message);
             } catch (RemoteException e) {
                 Log.e(getClass().getName(),
-                      "Exception while sending.",
-                      e);
+                        "Exception while sending.",
+                        e);
             }
         }
 
-	/**
-	 * Create a file to store the result of a download.
-	 * 
-	 * @param context
-	 * @param url
-	 * @return
-	 * @throws IOException
-	 */
-	private File getTemporaryFile(final Context context,
+        /**
+         * Create a file to store the result of a download.
+         *
+         * @param context
+         * @param url
+         * @return
+         * @throws IOException
+         */
+        private File getTemporaryFile(final Context context,
                                       final String url) throws IOException {
             return context.getFileStreamPath(Base64.encodeToString(url.getBytes(),
-                                                                   Base64.NO_WRAP)
-                                             + System.currentTimeMillis());
-	}
+                    Base64.NO_WRAP)
+                    + System.currentTimeMillis());
+        }
 
-	/**
-	 * Copy the contents of an InputStream into an OutputStream.
-	 * 
-	 * @param in
-	 * @param out
-	 * @return
-	 * @throws IOException
-	 */
-	private int copy(final InputStream in,
+        /**
+         * Copy the contents of an InputStream into an OutputStream.
+         *
+         * @param in
+         * @param out
+         * @return
+         * @throws IOException
+         */
+        private int copy(final InputStream in,
                          final OutputStream out) throws IOException {
             final int BUFFER_LENGTH = 1024;
             final byte[] buffer = new byte[BUFFER_LENGTH];
@@ -193,29 +193,29 @@ public class DownloadService extends Service
 
             while ((read = in.read(buffer)) != -1) {
                 out.write(buffer, 0, read);
-                totalRead += read;			
+                totalRead += read;
             }
 
             return totalRead;
-	}
+        }
 
-	/**
-	 * Download the requested image and return the local file path.
-	 * 
-	 * @param context
-	 * @param url
-	 * @return
-	 */
-	public String downloadImage(final Context context,
+        /**
+         * Download the requested image and return the local file path.
+         *
+         * @param context
+         * @param url
+         * @return
+         */
+        public String downloadImage(final Context context,
                                     final String url) {
             try {
                 final File file = getTemporaryFile(context, url);
                 Log.d(getClass().getName(), "    downloading to " + file);
 
                 final InputStream in = (InputStream)
-                    new URL(url).getContent();
+                        new URL(url).getContent();
                 final OutputStream out =
-                    new FileOutputStream(file);
+                        new FileOutputStream(file);
 
                 copy(in, out);
                 in.close();
@@ -223,13 +223,13 @@ public class DownloadService extends Service
                 return file.getAbsolutePath();
             } catch (Exception e) {
                 Log.e(getClass().getName(),
-                      "Exception while downloading. Returning null.");
+                        "Exception while downloading. Returning null.");
                 Log.e(getClass().getName(),
-                      e.toString());
+                        e.toString());
                 e.printStackTrace();
                 return null;
             }
-	}
+        }
 
         /**
          * Hook method that retrieves an image from a remote server.
@@ -239,50 +239,50 @@ public class DownloadService extends Service
             // DownloadActivity via the Messenger sent with the
             // Intent.
             downloadImageAndReply((Intent) message.obj);
-            
+
             // Stop the Service using the startId, so it doesn't stop
             // in the middle of handling another download request.
             stopSelf(message.arg1);
         }
     }
-    
+
     /**
      * Hook method called when DownloadService is first launched by
      * the Android ActivityManager.
      */
     public void onCreate() {
         super.onCreate();
-        
+
         // Create and start a background HandlerThread since by
         // default a Service runs in the UI Thread, which we don't
         // want to block.
         HandlerThread thread =
-            new HandlerThread("DownloadService");
+                new HandlerThread("DownloadService");
         thread.start();
-        
+
         // Get the HandlerThread's Looper and use it for our Handler.
         mServiceLooper = thread.getLooper();
         mServiceHandler =
-            new ServiceHandler(mServiceLooper);
+                new ServiceHandler(mServiceLooper);
     }
 
     /**
      * Hook method called each time a Started Service is sent an
      * Intent via startService().
      */
-    public int onStartCommand(Intent intent, 
+    public int onStartCommand(Intent intent,
                               int flags,
                               int startId) {
         // Create a Message that will be sent to ServiceHandler to
         // retrieve animagebased on the URI in the Intent.
         Message message =
-            mServiceHandler.makeDownloadMessage(intent,
-                                                startId);
-        
+                mServiceHandler.makeDownloadMessage(intent,
+                        startId);
+
         // Send the Message to ServiceHandler to retrieve an image
         // based on contents of the Intent.
         mServiceHandler.sendMessage(message);
-        
+
         // Don't restart the DownloadService automatically if its
         // process is killed while it's running.
         return Service.START_NOT_STICKY;
